@@ -196,6 +196,7 @@ void NDArrayConverter::init()
 
 cv::Mat NDArrayConverter::toMat(const PyObject *o)
 {
+    std::cout << "####" << std::endl;
     cv::Mat m;
 
     if(!o || o == Py_None)
@@ -238,6 +239,8 @@ cv::Mat NDArrayConverter::toMat(const PyObject *o)
     {
         size[i] = (int)_sizes[i];
         step[i] = (size_t)_strides[i];
+
+        std::cout << "Size: " << size[i] << " Step: " << step[i] << std::endl;
     }
 
     if( ndims == 0 || step[ndims-1] > elemsize ) {
@@ -245,6 +248,8 @@ cv::Mat NDArrayConverter::toMat(const PyObject *o)
         step[ndims] = elemsize;
         ndims++;
     }
+
+    std::cout << "ndims = " << ndims << std::endl;
 
     if( ndims >= 2 && step[0] < step[1] )
     {
@@ -270,10 +275,16 @@ cv::Mat NDArrayConverter::toMat(const PyObject *o)
     
     if( ndims > 2)
     {
+        std::cout << "Here" << std::endl;
         failmsg("toMat: Object has more than 2 dimensions");
     }
     
     m = Mat(ndims, size, type, PyArray_DATA(o), step);
+    std::cout << m.size() << " x " << m.channels() << std::endl;
+    for(int i = 0; i < ndims; i++)
+    {
+        std::cout << "Size: " << size[i] << " Step: " << step[i] << std::endl;
+    }
     // m.u = g_numpyAllocator.allocate(o, ndims, size, type, step);
     
     if( m.data )
@@ -291,11 +302,13 @@ cv::Mat NDArrayConverter::toMat(const PyObject *o)
 
     if( transposed )
     {
+        std::cout << m.channels() << std::endl;
         Mat tmp;
         tmp.allocator = &g_numpyAllocator;
         transpose(m, tmp);
         m = tmp;
     }
+    std::cout << m.channels() << std::endl;
     return m;
 }
 
